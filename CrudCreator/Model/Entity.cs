@@ -57,8 +57,12 @@ using System.Threading.Tasks;
 
 namespace Entities_POJO
 {
-public class "+pname+@" : BaseEntity
-{"+
+public class "+pname+ @" : BaseEntity
+{
+    int id;
+    public string Id { get => id; set => id= value; }
+
+" +
     attributes
     +@"
         public "+pname+@"()
@@ -257,13 +261,6 @@ GO
                     parametersName += "\n";
                 }
             }
-
-
-
-
-
-
-
             string result = @"
 SET ANSI_NULLS ON
 GO
@@ -279,6 +276,100 @@ END
             
             SqlInsert = result;
         }
+
+
+
+
+        public void DefineMapper(String pname, Attr[] param)
+        {
+            string columns = "";
+            string parametros = "";
+
+            StringBuilder result = new StringBuilder();
+            result.Append("using DataAcess.Dao;\n");
+            result.Append("using Entities_POJO;\n");
+            result.Append("using System.Collections.Generic;\n");
+            result.Append("namespace DataAcess.Mapper\n");
+            result.Append("{\n");
+            result.Append("public class "+pname+ " : EntityMapper, ISqlStaments, IObjectMapper\n");
+            result.Append("{\n");
+            result.Append(columns);
+            result.Append("public SqlOperation GetCreateStatement(BaseEntity entity)\n");
+            result.Append("{\n");
+            result.Append("var operation = new SqlOperation {ProcedureName = \"INS_" + pname+ "\"};\n");
+            result.Append("var c = ("+pname+ ") entity;\n");
+            result.Append(parametros + "\n");
+            result.Append("return operation;\n");
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
+            /*Finaliza GetCreateStatement*/
+
+            result.Append("public SqlOperation GetRetriveStatement(BaseEntity entity)");
+            result.Append("{");
+            result.Append("var operation = new SqlOperation {ProcedureName = \"Select_By_ID_" + pname+"\"};");
+            result.Append("var c = ("+pname+")entity;");
+            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);");
+            result.Append("return operation;");
+            result.Append("}");
+
+            /*Finaliza GetRetriveStatement*/
+
+            result.Append("public SqlOperation GetRetriveAllStatement()");
+            result.Append("{");
+            result.Append("var operation = new SqlOperation { ProcedureName = Select_All_" + pname+" };");
+            result.Append("return operation;");
+            result.Append("}");
+
+            /*Finaliza GetRetrieveAllStatement*/
+
+            result.Append("public SqlOperation GetUpdateStatement(BaseEntity entity)");
+            result.Append("{");
+            result.Append("var operation = new SqlOperation { ProcedureName = UPD_"+pname+" };");
+            result.Append("var c = ("+pname+")entity;");
+            result.Append(parametros);
+            result.Append("return operation;");
+            result.Append("}");
+
+            /*Finaliza GetUpdateStatement*/
+
+            /*SEGUIR ACA*/
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }
