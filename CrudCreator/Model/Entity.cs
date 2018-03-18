@@ -170,13 +170,34 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE PROCEDURE Select_All_" + pname + @"\n 
-	@P_ID int
+	@P_ID_" + pname + @"
 AS
 BEGIN
 	SET NOCOUNT ON;
 	UPDATE " + pname + @"
    select * from " + pname + @"
     where id_"+pname+@" = @P_ID
+END
+GO
+";
+            SqlSelectAll = result;
+        }
+
+        private void DefineDelete(String pname)
+        {
+
+            string result = @"SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE Select_All_" + pname + @"\n 
+	@P_ID_" + pname + @"
+AS
+BEGIN
+	SET NOCOUNT ON;
+	Delete from " + pname+@"
+    where id_" + pname + @" = @P_ID_"+pname+@"
 END
 GO
 ";
