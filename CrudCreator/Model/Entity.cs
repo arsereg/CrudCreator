@@ -11,16 +11,20 @@ namespace CrudCreator.Model
         String classDefinition;
         String sqlCreate;
         String sqlUpdate;
+        String sqlSelectAll;
 
         public string ClassDefinition { get => classDefinition; set => classDefinition = value; }
         public string SqlCreate { get => sqlCreate; set => sqlCreate = value; }
         public string SqlUpdate { get => sqlUpdate; set => sqlUpdate = value; }
+        public string SqlSelectAll { get => sqlSelectAll; set => sqlSelectAll = value; }
 
         public void Define(String pname, Attr[] param)
         {
             DefineClass(pname, param);
             DefineSql(pname, param);
             DefineUpdate(pname, param);
+            DefineSelectAll(pname);
+            DefineSelectById(pname);
         }
         private void DefineClass(String pname, Attr[] param)
         {
@@ -133,5 +137,51 @@ GO
 ";
             SqlUpdate = result;
         }
+
+
+
+        private void DefineSelectAll(String pname)
+        {
+
+            string result = @"SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE Select_All_" + pname + @"\n 
+	
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE " + pname + @"
+   select * from "+pname+@"
+END
+GO
+";
+            SqlSelectAll = result;
+        }
+
+        private void DefineSelectById(String pname)
+        {
+
+            string result = @"SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE Select_All_" + pname + @"\n 
+	@P_ID int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE " + pname + @"
+   select * from " + pname + @"
+    where id_"+pname+@" = @P_ID
+END
+GO
+";
+            SqlSelectAll = result;
+        }
+
     }
 }
