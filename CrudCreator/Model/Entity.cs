@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CrudCreator.Model
 {
@@ -12,11 +13,17 @@ namespace CrudCreator.Model
         String sqlCreate;
         String sqlUpdate;
         String sqlSelectAll;
+        String sqlSelectById;
+        String sqlInsert;
+        String sqlDelete;
 
         public string ClassDefinition { get => classDefinition; set => classDefinition = value; }
         public string SqlCreate { get => sqlCreate; set => sqlCreate = value; }
         public string SqlUpdate { get => sqlUpdate; set => sqlUpdate = value; }
         public string SqlSelectAll { get => sqlSelectAll; set => sqlSelectAll = value; }
+        public string SqlInsert { get => sqlInsert; set => sqlInsert = value; }
+        public string SqlSelectById { get => sqlSelectById; set => sqlSelectById = value; }
+        public string SqlDelete { get => sqlDelete; set => sqlDelete = value; }
 
         public void Define(String pname, Attr[] param)
         {
@@ -25,6 +32,8 @@ namespace CrudCreator.Model
             DefineUpdate(pname, param);
             DefineSelectAll(pname);
             DefineSelectById(pname);
+            DefineInsert(pname, param);
+            DefineDelete(pname);
         }
         private void DefineClass(String pname, Attr[] param)
         {
@@ -148,12 +157,11 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE Select_All_" + pname + @"\n 
+CREATE PROCEDURE Select_All_" + pname + @"
 	
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE " + pname + @"
    select * from "+pname+@"
 END
 GO
@@ -169,18 +177,17 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE Select_All_" + pname + @"\n 
-	@P_ID_" + pname + @"
+CREATE PROCEDURE Select_By_ID_" + pname + @"
+	@P_ID_" + pname + @" int
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE " + pname + @"
    select * from " + pname + @"
-    where id_"+pname+@" = @P_ID
+    where id_"+pname+@" = @P_ID_"+pname+@"
 END
 GO
 ";
-            SqlSelectAll = result;
+            SqlSelectById = result;
         }
 
         private void DefineDelete(String pname)
@@ -191,8 +198,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE Select_All_" + pname + @"\n 
-	@P_ID_" + pname + @"
+CREATE PROCEDURE Del_" + pname + @"
+	@P_ID_" + pname + @" int
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -201,8 +208,78 @@ BEGIN
 END
 GO
 ";
-            SqlSelectAll = result;
+            sqlDelete = result;
+        }
+
+        public void DefineInsert(String pname, Attr[] param)
+        {
+           
+            string names = "";
+            for (int i = 0; i < param.Length; i++)
+            {
+                names += param[i].Name;
+                if (i < param.Length -1)
+                {
+                    names += ",\n";
+                }
+            }
+            string parametersType = "";
+            for (int i = 0; i < param.Length; i++)
+            {
+                string name = param[i].Name;
+                string type = DefineColumn(param[i]);
+                parametersType += "@P_" + name + " " + type;
+
+                if (i < param.Length - 1)
+                {
+                    parametersType += ",\n";
+                }
+                else
+                {
+                    parametersType += "\n";
+                }
+            }
+
+
+            string parametersName = "";
+            for (int i = 0; i < param.Length; i++)
+            {
+                string name = param[i].Name;
+                string type = DefineColumn(param[i]);
+                parametersName += "@P_" + name;
+
+                if (i < param.Length - 1)
+                {
+                    parametersName += ",\n";
+                }
+                else
+                {
+                    parametersName += "\n";
+                }
+            }
+
+
+
+
+
+
+
+            string result = @"
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create PROCEDURE INS_"+pname + "\n" +parametersType+@"
+	
+AS
+BEGIN
+	INSERT INTO "+pname+@"("+names+@") VALUES("+parametersName+@")
+END
+";
+            
+            SqlInsert = result;
         }
 
     }
 }
+

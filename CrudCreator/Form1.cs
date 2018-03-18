@@ -36,9 +36,13 @@ namespace CrudCreator
             Entity prueba = new Entity();
             Attr[] arr = { uno, dos, fechaNacimiento };
             prueba.Define("Persona", arr);
-            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\testobject.cs", prueba.ClassDefinition);
-            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\testsql.cs", prueba.SqlCreate);
-            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\testsqlUpdate.cs", prueba.SqlUpdate);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testobject.cs", prueba.ClassDefinition);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsql.cs", prueba.SqlCreate);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlUpdate.cs", prueba.SqlUpdate);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlSelectAll.cs", prueba.SqlSelectAll);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlSelectById.cs", prueba.SqlSelectById);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlDelete.cs", prueba.SqlDelete);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlInsert.cs", prueba.SqlInsert);
         }
     }
 }
