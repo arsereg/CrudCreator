@@ -23,6 +23,7 @@ namespace CrudCreator
             Attr uno = new Attr();
             Attr dos = new Attr();
             Attr fechaNacimiento = new Attr();
+            Attr tres = new Attr();
             uno.Name = "Nombre";
             uno.Type = "String";
             uno.Visibility = "Public";
@@ -32,10 +33,13 @@ namespace CrudCreator
             fechaNacimiento.Name = "fechaNacimiento";
             fechaNacimiento.Type = "DateTime";
             fechaNacimiento.Visibility = "public";
+            tres.Name = "Color";
+            tres.Type = "String";
+            tres.Visibility = "private";
 
             Entity prueba = new Entity();
-            Attr[] arr = { uno, dos, fechaNacimiento };
-            prueba.Define("Persona", arr);
+            Attr[] arr = { uno, dos, fechaNacimiento, tres };
+            prueba.Define("Figura", arr);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testobject.cs", prueba.ClassDefinition);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsql.cs", prueba.SqlCreate);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlUpdate.cs", prueba.SqlUpdate);
@@ -43,6 +47,12 @@ namespace CrudCreator
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlSelectById.cs", prueba.SqlSelectById);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlDelete.cs", prueba.SqlDelete);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlInsert.cs", prueba.SqlInsert);
+            System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testMapper.cs", prueba.Mapper);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

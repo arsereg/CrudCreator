@@ -16,6 +16,7 @@ namespace CrudCreator.Model
         String sqlSelectById;
         String sqlInsert;
         String sqlDelete;
+        String mapper;
 
         public string ClassDefinition { get => classDefinition; set => classDefinition = value; }
         public string SqlCreate { get => sqlCreate; set => sqlCreate = value; }
@@ -24,6 +25,7 @@ namespace CrudCreator.Model
         public string SqlInsert { get => sqlInsert; set => sqlInsert = value; }
         public string SqlSelectById { get => sqlSelectById; set => sqlSelectById = value; }
         public string SqlDelete { get => sqlDelete; set => sqlDelete = value; }
+        public string Mapper { get => mapper; set => mapper = value; }
 
         public void Define(String pname, Attr[] param)
         {
@@ -34,6 +36,7 @@ namespace CrudCreator.Model
             DefineSelectById(pname);
             DefineInsert(pname, param);
             DefineDelete(pname);
+            DefineMapper(pname, param);
         }
         private void DefineClass(String pname, Attr[] param)
         {
@@ -284,6 +287,41 @@ END
         {
             string columns = "";
             string parametros = "";
+            string parametrosParaConstruir = "";
+
+            for (int i = 0; i < param.Length; i++)
+            {
+                string unParam = "private const string DB_COL_" + param[i].Name + "= \""+param[i].Name+"\"";
+                string prefix = param[i].Name + " = ";
+                string suffix = "(DB_COL_" + param[i].Name + ", c." + param[i].Name + ");\n";
+                switch (param[i].Type.ToLower())
+                {
+                    case "string":
+                        parametros += "operation.AddVarcharParam" + suffix;
+                        parametrosParaConstruir += prefix + "GetStringValue(row, DB_COL_" + param[i].Name + ")";
+                        break;
+                    case "int":
+                        parametros += "operation.AddIntParam" + suffix;
+                        parametrosParaConstruir += prefix + "GetIntValue(row, DB_COL_" + param[i].Name + ")";
+                        break;
+                    case "double":
+                        parametros += "operation.AddDoubleParam" + suffix;
+                        parametrosParaConstruir += prefix + "GetDoubleValue(row, DB_COL_" + param[i].Name + ")";
+                        break;
+                    case "datetime":
+                        parametros += "operation.AddVarcharParam" + suffix;
+                        parametrosParaConstruir += prefix + "GetDateValue(row, DB_COL_" + param[i].Name + ")";
+                        break;
+                    case "boolean":
+                        parametros += "operation.AddVarcharParam"+suffix;
+                        parametrosParaConstruir += prefix + "GetBooleanValue(row, DB_COL_" + param[i].Name + ")";
+                        break;
+                }
+                if (i <param.Length -1)
+                {
+                    parametrosParaConstruir += ",\n";
+                }
+            }
 
             StringBuilder result = new StringBuilder();
             result.Append("using DataAcess.Dao;\n");
@@ -294,6 +332,8 @@ END
             result.Append("public class "+pname+ " : EntityMapper, ISqlStaments, IObjectMapper\n");
             result.Append("{\n");
             result.Append(columns);
+
+            /*Comienzan definiciones de procedimientos*/
             result.Append("public SqlOperation GetCreateStatement(BaseEntity entity)\n");
             result.Append("{\n");
             result.Append("var operation = new SqlOperation {ProcedureName = \"INS_" + pname+ "\"};\n");
@@ -307,69 +347,82 @@ END
             }
             /*Finaliza GetCreateStatement*/
 
-            result.Append("public SqlOperation GetRetriveStatement(BaseEntity entity)");
-            result.Append("{");
-            result.Append("var operation = new SqlOperation {ProcedureName = \"Select_By_ID_" + pname+"\"};");
-            result.Append("var c = ("+pname+")entity;");
-            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);");
+            result.Append("public SqlOperation GetRetriveStatement(BaseEntity entity)\n");
+            result.Append("{\n");
+            result.Append("var operation = new SqlOperation {ProcedureName = \"Select_By_ID_" + pname+ "\"};\n");
+            result.Append("var c = ("+pname+ ")entity;\n");
+            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);\n");
             result.Append("return operation;");
-            result.Append("}");
-
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
             /*Finaliza GetRetriveStatement*/
 
-            result.Append("public SqlOperation GetRetriveAllStatement()");
-            result.Append("{");
-            result.Append("var operation = new SqlOperation { ProcedureName = Select_All_" + pname+" };");
-            result.Append("return operation;");
-            result.Append("}");
-
+            result.Append("public SqlOperation GetRetriveAllStatement()\n");
+            result.Append("{\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = Select_All_" + pname+ " };\n");
+            result.Append("return operation;\n");
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
             /*Finaliza GetRetrieveAllStatement*/
 
-            result.Append("public SqlOperation GetUpdateStatement(BaseEntity entity)");
-            result.Append("{");
-            result.Append("var operation = new SqlOperation { ProcedureName = UPD_"+pname+" };");
-            result.Append("var c = ("+pname+")entity;");
-            result.Append(parametros);
-            result.Append("return operation;");
-            result.Append("}");
-
+            result.Append("public SqlOperation GetUpdateStatement(BaseEntity entity)\n");
+            result.Append("{\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = UPD_"+pname+ " };\n");
+            result.Append("var c = ("+pname+ ")entity;\n");
+            result.Append(parametros + "\n");
+            result.Append("return operation;\n");
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
             /*Finaliza GetUpdateStatement*/
 
-            /*SEGUIR ACA*/
+            result.Append("public SqlOperation GetDeleteStatement(BaseEntity entity)\n");
+            result.Append("{\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = Del_" + pname+ " };\n");
+            result.Append("var c = ("+pname+ ")entity;\n");
+            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);\n");
+            result.Append("return operation;\n");
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
+            /*Finaliza GetDeleteStatement*/
+
+            result.Append("public List<BaseEntity> BuildObjects(List<Dictionary<string, object>> lstRows)\n");
+            result.Append("{\n");
+            result.Append("var lstResults = new List<BaseEntity>();\n");
+            result.Append("foreach (var row in lstRows)\n");
+            result.Append("{\n");
+            result.Append("var "+pname+ " = BuildObject(row);\n");
+            result.Append("lstResults.Add("+pname+ ");\n");
+            result.Append("}\n");
+            for (int i = 0; i < 3; i++)
+            {
+                result.Append("\n");
+            }
+            /*Finaliza BuildObjects*/
+
+            result.Append("public BaseEntity BuildObject(Dictionary<string, object> row)\n");
+            result.Append("{\n");
+            result.Append("var "+pname.ToUpper()+" = new "+pname+ "\n");
+            result.Append("{\n");
+            result.Append(parametrosParaConstruir + "\n");
+            result.Append("};\n");
+            result.Append("return customer;\n");
+            result.Append("}\n");
+            result.Append("}\n");
+            result.Append("}\n");
+            Mapper = result.ToString();
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
 }
