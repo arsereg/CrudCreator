@@ -67,6 +67,7 @@ namespace CrudCreatorConsole
             Console.WriteLine("Digite el nombre de la clase.");
             name = Console.ReadLine();
             nameAdded = true;
+            Console.WriteLine();
         }
 
         public static void AgregarAtributo()
@@ -74,8 +75,9 @@ namespace CrudCreatorConsole
             Attr unAtributo = new Attr();
             Console.WriteLine("Digite el nombre del atributo:");
             String userInput = Console.ReadLine();
+            Console.WriteLine();
             unAtributo.SqlName = userInput.ToUpper().Replace(" ", "_");
-            unAtributo.Name = PascalCase(userInput);
+            unAtributo.Name = Entity.PascalCase(userInput);
             Console.WriteLine("Seleccione la privacidad del atributo:");
             Console.WriteLine("1- public");
             Console.WriteLine("2- private");
@@ -86,6 +88,7 @@ namespace CrudCreatorConsole
                 case 2: unAtributo.Visibility = "private";
                     break;
             }
+            Console.WriteLine("");
             Console.WriteLine("Digite el tipo:");
             string[] types = { "String", "int", "double", "bool", "DateTime"};
             for (int i = 0; i < types.Length; i++)
@@ -95,32 +98,83 @@ namespace CrudCreatorConsole
             unAtributo.Type = types[int.Parse(Console.ReadLine()) -1];
             atributos.Add(unAtributo);
             attAdded = true;
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("----------");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Parametro agregado: ");
+            ImprimirAtributos(unAtributo);
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("----------");
+            Console.ForegroundColor = ConsoleColor.White;
+
         }
 
         public static void Reiniciar()
         {
-            atributos = new List<Attr>();
-            name = "";
-            attAdded = false;
-            nameAdded = false;
+            Console.WriteLine("Desea reiniciar el estado? S/N");
+            if (Console.ReadLine().ToLower().Equals("s"))
+            {
+                atributos = new List<Attr>();
+                name = "";
+                attAdded = false;
+                nameAdded = false;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("---------------");
+                Console.WriteLine("Todos los campos se reiniciaron");
+                Console.WriteLine("---------------");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("---------------");
+                Console.WriteLine("Se mantiene estado");
+                Console.WriteLine("---------------");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         public static void Procesar()
         {
             if (attAdded && nameAdded)
             {
-                unaEntidad.Define(name, atributos.ToArray());
-                EscribirArchivos();
-                Reiniciar();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("-----------------------------");
-                Console.WriteLine("Entidad " + name + " agregada");
-                Console.WriteLine("-----------------------------");
+                Console.WriteLine("Está seguro que desea procesar la entidad? S/N");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(name);
                 Console.ForegroundColor = ConsoleColor.White;
+                foreach (Attr at in atributos)
+                {
+                    ImprimirAtributos(at);
+                }
+                if (Console.ReadLine().ToLower().Equals("s"))
+                {
+                    unaEntidad.Define(name, atributos.ToArray());
+                    EscribirArchivos();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("-----------------------------");
+                    Console.WriteLine("Entidad " + name + " creada");
+                    Console.WriteLine("-----------------------------");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Reiniciar();
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("-----------------------------");
+                    Console.WriteLine("Entidad no escrita. Estado se mantiene intacto.");
+                    Console.WriteLine("-----------------------------");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("---------------");
                 Console.WriteLine("Asegurese de haber agregado un nombre y al menos un atributo para la entidad");
+                Console.WriteLine("---------------");
+                Console.ForegroundColor = ConsoleColor.White;
+                
             }
         }
 
@@ -129,7 +183,7 @@ namespace CrudCreatorConsole
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\Objetos\" + @"\" + name.ToLowerInvariant() + @"\";
             System.IO.FileInfo file = new System.IO.FileInfo(path);
             file.Directory.Create();
-            System.IO.File.WriteAllText(file.FullName + name + ".cs", unaEntidad.ClassDefinition);
+            System.IO.File.WriteAllText(file.FullName + Entity.PascalCase(name) + ".cs", unaEntidad.ClassDefinition);
             System.IO.File.WriteAllText(file.FullName + name + "_SQL_Create.sql", unaEntidad.SqlCreate);
             System.IO.File.WriteAllText(file.FullName + name + "_SQL_Update.sql", unaEntidad.SqlUpdate);
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Select_All.sql", unaEntidad.SqlSelectAll);
@@ -140,32 +194,17 @@ namespace CrudCreatorConsole
             Process.Start(path);
         }
 
-        public static string PascalCase(string textToChange)
+        public static void ImprimirAtributos(Attr pAtributo)
         {
-            System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
-
-            foreach (char c in textToChange)
-            {
-
-                if (!Char.IsLetterOrDigit(c))
-                {
-                    resultBuilder.Append(" ");
-                }
-                else
-                {
-                    resultBuilder.Append(c);
-                }
-            }
-
-            string result = resultBuilder.ToString();
-
-
-            result = result.ToLower();
-
-            TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
-
-            return myTI.ToTitleCase(result).Replace(" ", String.Empty);
-
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(pAtributo.Visibility + " ");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write(pAtributo.Type + " ");
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine(pAtributo.Name);
+            Console.ForegroundColor = ConsoleColor.White;
         }
+
+       
     }
 }

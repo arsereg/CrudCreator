@@ -330,10 +330,10 @@ END
             }
 
             StringBuilder result = new StringBuilder();
-            result.Append("using DataAcess.Dao;\n");
+            result.Append("using DataAccess.Dao;\n");
             result.Append("using Entities_POJO;\n");
             result.Append("using System.Collections.Generic;\n");
-            result.Append("namespace DataAcess.Mapper\n");
+            result.Append("namespace DataAccess.Mapper\n");
             result.Append("{\n");
             result.Append("public class " + pname + " : EntityMapper, ISqlStaments, IObjectMapper\n");
             result.Append("{\n");
