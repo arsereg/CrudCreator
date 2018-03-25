@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,10 +60,15 @@ using System.Threading.Tasks;
 
 namespace Entities_POJO
 {
-public class " + pname + @" : BaseEntity
+public class " + PascalCase(pname) + @" : BaseEntity
 {
+<<<<<<< Updated upstream
     int id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @";
-    public string Id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @" { get => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"; set => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"= value; }
+    public int Id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @" { get => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"; set => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"= value; }
+=======
+    int id;
+    public int Id { get => id; set => id= value; }
+>>>>>>> Stashed changes
 
 " +
     attributes
@@ -80,7 +86,7 @@ public class " + pname + @" : BaseEntity
             string parameters = "";
             for (int i = 0; i < param.Length; i++)
             {
-                parameters += ",\n" + param[i].Name + " " + DefineColumn(param[i]);
+                parameters += ",\n" + param[i].SqlName + " " + DefineColumn(param[i]);
 
             }
             string result = @"CREATE TABLE " + pname + @" (
@@ -428,6 +434,36 @@ END
             result.Append("}\n");
             result.Append("}\n");
             Mapper = result.ToString();
+        }
+
+
+
+        public static string PascalCase(string textToChange)
+        {
+            System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
+
+            foreach (char c in textToChange)
+            {
+
+                if (!Char.IsLetterOrDigit(c))
+                {
+                    resultBuilder.Append(" ");
+                }
+                else
+                {
+                    resultBuilder.Append(c);
+                }
+            }
+
+            string result = resultBuilder.ToString();
+
+
+            result = result.ToLower();
+
+            TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
+
+            return myTI.ToTitleCase(result).Replace(" ", String.Empty);
+
         }
 
     }
