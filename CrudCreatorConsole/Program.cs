@@ -190,7 +190,7 @@ namespace CrudCreatorConsole
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Select_By_Id.sql", unaEntidad.SqlSelectById);
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Delete.sql", unaEntidad.SqlDelete);
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Insert.sql", unaEntidad.SqlInsert);
-            System.IO.File.WriteAllText(file.FullName + name + "_Mapper.cs", unaEntidad.Mapper);
+            System.IO.File.WriteAllText(file.FullName + name + "Mapper.cs", unaEntidad.Mapper);
             Process.Start(path);
         }
 

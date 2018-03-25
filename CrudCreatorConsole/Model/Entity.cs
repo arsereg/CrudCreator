@@ -341,7 +341,7 @@ END
             result.Append("using System.Collections.Generic;\n");
             result.Append("namespace DataAccess.Mapper\n");
             result.Append("{\n");
-            result.Append("public class " + pname + " : EntityMapper, ISqlStaments, IObjectMapper\n");
+            result.Append("public class " + pname + "Mapper : EntityMapper, ISqlStaments, IObjectMapper\n");
             result.Append("{\n");
             result.Append(columns);
 
