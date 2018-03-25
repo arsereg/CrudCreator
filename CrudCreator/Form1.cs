@@ -20,26 +20,37 @@ namespace CrudCreator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Attr uno = new Attr();
-            Attr dos = new Attr();
-            Attr fechaNacimiento = new Attr();
-            Attr tres = new Attr();
-            uno.Name = "Nombre";
-            uno.Type = "String";
-            uno.Visibility = "Public";
-            dos.Name = "Apellido";
-            dos.Type = "String";
-            dos.Visibility = "Private";
-            fechaNacimiento.Name = "fechaNacimiento";
-            fechaNacimiento.Type = "DateTime";
-            fechaNacimiento.Visibility = "public";
-            tres.Name = "Color";
-            tres.Type = "String";
-            tres.Visibility = "private";
+
+            Attr nombre = new Attr();
+            Attr ubicacion = new Attr();
+            Attr capMax = new Attr();
+            Attr cantParqueoBus = new Attr();
+            Attr costoParqueo = new Attr();
+
+            nombre.Name = "nombre";
+            nombre.Type = "string";
+            nombre.Visibility = "private";
+
+            ubicacion.Name = "ubicacion";
+            ubicacion.Type = "string";
+            ubicacion.Visibility = "private";
+
+            capMax.Name = "capacidadMaxima";
+            capMax.Type = "string";
+            capMax.Visibility = "private";
+
+            cantParqueoBus.Name = "cantParqueoBus";
+            cantParqueoBus.Type = "int";
+            cantParqueoBus.Visibility = "private";
+
+            costoParqueo.Name = "costoParqueo";
+            costoParqueo.Type = "double";
+            costoParqueo.Visibility = "private";
+
 
             Entity prueba = new Entity();
-            Attr[] arr = { uno, dos, fechaNacimiento, tres };
-            prueba.Define("Figura", arr);
+            Attr[] arr = { nombre, ubicacion, capMax, cantParqueoBus, costoParqueo };
+            prueba.Define("Terminal", arr);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testobject.cs", prueba.ClassDefinition);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsql.cs", prueba.SqlCreate);
             System.IO.File.WriteAllText(@"C:\Users\arser\Desktop\sqltests\testsqlUpdate.cs", prueba.SqlUpdate);
@@ -53,6 +64,26 @@ namespace CrudCreator
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void AgregarRow()
+        {
+            MessageBox.Show("Tonses");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            AgregarRow();
         }
     }
 }

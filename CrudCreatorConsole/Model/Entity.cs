@@ -61,8 +61,8 @@ namespace Entities_POJO
 {
 public class " + pname + @" : BaseEntity
 {
-    int id;
-    public string Id { get => id; set => id= value; }
+    int id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @";
+    public string Id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @" { get => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"; set => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"= value; }
 
 " +
     attributes
@@ -296,9 +296,10 @@ END
 
             for (int i = 0; i < param.Length; i++)
             {
-                string unParam = "private const string DB_COL_" + param[i].Name + "= \"" + param[i].Name + "\"";
+                string unParam = "private const string DB_COL_" + param[i].Name + " = \"" + param[i].SqlName + "\";";
                 string prefix = param[i].Name + " = ";
                 string suffix = "(DB_COL_" + param[i].Name + ", c." + param[i].Name + ");\n";
+                columns += unParam + "\n";
                 switch (param[i].Type.ToLower())
                 {
                     case "string":

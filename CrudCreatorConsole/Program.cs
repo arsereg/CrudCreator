@@ -1,6 +1,8 @@
 ﻿using CrudCreatorConsole.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +19,11 @@ namespace CrudCreatorConsole
         static void Main(string[] args)
         {
             Init();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("8===D");
+            Console.WriteLine("Llevese esta");
+            Console.ForegroundColor = ConsoleColor.Red;
+            System.Threading.Thread.Sleep(5000);
         }
 
         public static void Init()
@@ -66,7 +73,9 @@ namespace CrudCreatorConsole
         {
             Attr unAtributo = new Attr();
             Console.WriteLine("Digite el nombre del atributo:");
-            unAtributo.Name = Console.ReadLine();
+            String userInput = Console.ReadLine();
+            unAtributo.SqlName = userInput.ToUpper().Replace(" ", "_");
+            unAtributo.Name = PascalCase(userInput);
             Console.WriteLine("Seleccione la privacidad del atributo:");
             Console.WriteLine("1- public");
             Console.WriteLine("2- private");
@@ -103,6 +112,11 @@ namespace CrudCreatorConsole
                 unaEntidad.Define(name, atributos.ToArray());
                 EscribirArchivos();
                 Reiniciar();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("Entidad " + name + " agregada");
+                Console.WriteLine("-----------------------------");
+                Console.ForegroundColor = ConsoleColor.White;
             }
             else
             {
@@ -123,6 +137,35 @@ namespace CrudCreatorConsole
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Delete.sql", unaEntidad.SqlDelete);
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Insert.sql", unaEntidad.SqlInsert);
             System.IO.File.WriteAllText(file.FullName + name + "_Mapper.cs", unaEntidad.Mapper);
+            Process.Start(path);
+        }
+
+        public static string PascalCase(string textToChange)
+        {
+            System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
+
+            foreach (char c in textToChange)
+            {
+
+                if (!Char.IsLetterOrDigit(c))
+                {
+                    resultBuilder.Append(" ");
+                }
+                else
+                {
+                    resultBuilder.Append(c);
+                }
+            }
+
+            string result = resultBuilder.ToString();
+
+
+            result = result.ToLower();
+
+            TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
+
+            return myTI.ToTitleCase(result).Replace(" ", String.Empty);
+
         }
     }
 }
