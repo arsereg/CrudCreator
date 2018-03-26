@@ -13,7 +13,9 @@ namespace CrudCreatorConsole
     {
         private static Entity unaEntidad = new Entity();
         private static List<Attr> atributos = new List<Attr>();
+        private static String fullName = "";
         private static String name = "";
+        private static String sqlName = "";
         private static bool attAdded = false;
         private static bool nameAdded = false;
         static void Main(string[] args)
@@ -65,7 +67,10 @@ namespace CrudCreatorConsole
         public static void AsignarNombre()
         {
             Console.WriteLine("Digite el nombre de la clase.");
-            name = Console.ReadLine();
+            string userInput = Console.ReadLine();
+            fullName = userInput;
+            name = Entity.PascalCase(userInput);
+            sqlName = userInput.ToUpper().Replace(" ", "_");
             nameAdded = true;
             Console.WriteLine();
         }
@@ -148,7 +153,7 @@ namespace CrudCreatorConsole
                 }
                 if (Console.ReadLine().ToLower().Equals("s"))
                 {
-                    unaEntidad.Define(name, atributos.ToArray());
+                    unaEntidad.Define(name, atributos.ToArray(), sqlName, fullName);
                     EscribirArchivos();
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("-----------------------------");
@@ -191,6 +196,7 @@ namespace CrudCreatorConsole
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Delete.sql", unaEntidad.SqlDelete);
             System.IO.File.WriteAllText(file.FullName + name + "_Sql_Insert.sql", unaEntidad.SqlInsert);
             System.IO.File.WriteAllText(file.FullName + name + "Mapper.cs", unaEntidad.Mapper);
+            System.IO.File.WriteAllText(file.FullName + name + "Manager.cs", unaEntidad.Manager);
             Process.Start(path);
         }
 

@@ -9,6 +9,8 @@ namespace CrudCreatorConsole.Model
 {
     class Entity
     {
+        String className;
+        String sqlName;
         String classDefinition;
         String sqlCreate;
         String sqlUpdate;
@@ -17,6 +19,7 @@ namespace CrudCreatorConsole.Model
         String sqlInsert;
         String sqlDelete;
         String mapper;
+        String manager;
 
         public string ClassDefinition { get => classDefinition; set => classDefinition = value; }
         public string SqlCreate { get => sqlCreate; set => sqlCreate = value; }
@@ -26,9 +29,14 @@ namespace CrudCreatorConsole.Model
         public string SqlSelectById { get => sqlSelectById; set => sqlSelectById = value; }
         public string SqlDelete { get => sqlDelete; set => sqlDelete = value; }
         public string Mapper { get => mapper; set => mapper = value; }
+        public string ClassName { get => className; set => className = value; }
+        public string SqlName { get => sqlName; set => sqlName = value; }
+        public string Manager { get => manager; set => manager = value; }
 
-        public void Define(String pname, Attr[] param)
+        public void Define(String pname, Attr[] param, string psqlName, string naturalName)
         {
+            sqlName = psqlName;
+            ClassName = naturalName;
             DefineClass(pname, param);
             DefineSql(pname, param);
             DefineUpdate(pname, param);
@@ -37,6 +45,7 @@ namespace CrudCreatorConsole.Model
             DefineInsert(pname, param);
             DefineDelete(pname);
             DefineMapper(pname, param);
+            DefineManager(pname, param);
         }
         private void DefineClass(String pname, Attr[] param)
         {
@@ -62,14 +71,8 @@ namespace Entities_POJO
 {
 public class " + PascalCase(pname) + @" : BaseEntity
 {
-<<<<<<< Updated upstream
     int id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @";
     public int Id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @" { get => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"; set => id"+ pname.First().ToString().ToUpper() + pname.Substring(1) + @"= value; }
-=======
-    int id;
-    public int Id { get => id; set => id= value; }
->>>>>>> Stashed changes
-
 " +
     attributes
     + @"
@@ -129,8 +132,8 @@ parameters + @"
             {
                 string name = param[i].Name;
                 string type = DefineColumn(param[i]);
-                parameters += "@P_" + name + " " + type;
-                sets += param[i].Name + " = @P_" + name;
+                parameters += "@P_" + param[i].SqlName + " " + type;
+                sets += param[i].Name + " = @P_" + param[i].SqlName;
 
                 if (i < param.Length - 1)
                 {
@@ -158,7 +161,7 @@ BEGIN
 	SET NOCOUNT ON;
 	UPDATE " + pname + @"
    SET " + sets + @"
-        WHERE id_" + pname + @" = @P_ID" + pname + @"
+        WHERE id_" + sqlName + @" = @P_ID_" + sqlName + @"
 END
 GO
 ";
@@ -175,7 +178,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE Select_All_" + pname + @"
+CREATE PROCEDURE Select_All_" + sqlName + @"
 	
 AS
 BEGIN
@@ -195,13 +198,13 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE Select_By_ID_" + pname + @"
-	@P_ID_" + pname + @" int
+CREATE PROCEDURE Select_By_ID_" + sqlName + @"
+	@P_ID_" + sqlName + @" int
 AS
 BEGIN
 	SET NOCOUNT ON;
    select * from " + pname + @"
-    where id_" + pname + @" = @P_ID_" + pname + @"
+    where id_" + sqlName + @" = @P_ID_" + sqlName + @"
 END
 GO
 ";
@@ -217,12 +220,12 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE PROCEDURE Del_" + pname + @"
-	@P_ID_" + pname + @" int
+	@P_ID_" + sqlName + @" int
 AS
 BEGIN
 	SET NOCOUNT ON;
 	Delete from " + pname + @"
-    where id_" + pname + @" = @P_ID_" + pname + @"
+    where id_" + sqlName + @" = @P_ID_" + sqlName + @"
 END
 GO
 ";
@@ -244,9 +247,9 @@ GO
             string parametersType = "";
             for (int i = 0; i < param.Length; i++)
             {
-                string name = param[i].Name;
+                string name = param[i].SqlName;
                 string type = DefineColumn(param[i]);
-                parametersType += "@P_" + name + " " + type;
+                parametersType += "@P_" + param[i].SqlName + " " + type;
 
                 if (i < param.Length - 1)
                 {
@@ -264,7 +267,7 @@ GO
             {
                 string name = param[i].Name;
                 string type = DefineColumn(param[i]);
-                parametersName += "@P_" + name;
+                parametersName += "@P_" + param[i].SqlName;
 
                 if (i < param.Length - 1)
                 {
@@ -296,7 +299,7 @@ END
 
         public void DefineMapper(String pname, Attr[] param)
         {
-            string columns = "";
+            string columns = "private const string DB_COL_ID_" + sqlName + " = \"ID_"+sqlName+"\";\n";
             string parametros = "";
             string parametrosParaConstruir = "";
 
@@ -363,7 +366,7 @@ END
             result.Append("{\n");
             result.Append("var operation = new SqlOperation {ProcedureName = \"Select_By_ID_" + pname + "\"};\n");
             result.Append("var c = (" + pname + ")entity;\n");
-            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);\n");
+            result.Append("operation.AddIntParam(DB_COL_ID_"+sqlName+@", c.Id"+pname+");\n");
             result.Append("return operation;");
             result.Append("}\n");
             for (int i = 0; i < 3; i++)
@@ -374,7 +377,7 @@ END
 
             result.Append("public SqlOperation GetRetriveAllStatement()\n");
             result.Append("{\n");
-            result.Append("var operation = new SqlOperation { ProcedureName = Select_All_" + pname + " };\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = \"Select_All_" + pname + "\" };\n");
             result.Append("return operation;\n");
             result.Append("}\n");
             for (int i = 0; i < 3; i++)
@@ -385,7 +388,7 @@ END
 
             result.Append("public SqlOperation GetUpdateStatement(BaseEntity entity)\n");
             result.Append("{\n");
-            result.Append("var operation = new SqlOperation { ProcedureName = UPD_" + pname + " };\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = \"UPD_" + pname + "\" };\n");
             result.Append("var c = (" + pname + ")entity;\n");
             result.Append(parametros + "\n");
             result.Append("return operation;\n");
@@ -398,15 +401,16 @@ END
 
             result.Append("public SqlOperation GetDeleteStatement(BaseEntity entity)\n");
             result.Append("{\n");
-            result.Append("var operation = new SqlOperation { ProcedureName = Del_" + pname + " };\n");
+            result.Append("var operation = new SqlOperation { ProcedureName = \"Del_" + pname + "\"};\n");
             result.Append("var c = (" + pname + ")entity;\n");
-            result.Append("operation.AddVarcharParam(DB_COL_ID, c.Id);\n");
+            result.Append("operation.AddIntParam(DB_COL_ID_"+sqlName+@", c.Id"+pname+");\n");
             result.Append("return operation;\n");
             result.Append("}\n");
             for (int i = 0; i < 3; i++)
             {
                 result.Append("\n");
             }
+
             /*Finaliza GetDeleteStatement*/
 
             result.Append("public List<BaseEntity> BuildObjects(List<Dictionary<string, object>> lstRows)\n");
@@ -416,6 +420,8 @@ END
             result.Append("{\n");
             result.Append("var " + pname + " = BuildObject(row);\n");
             result.Append("lstResults.Add(" + pname + ");\n");
+            result.Append("}\n");
+            result.Append("return lstResults");
             result.Append("}\n");
             for (int i = 0; i < 3; i++)
             {
@@ -429,12 +435,52 @@ END
             result.Append("{\n");
             result.Append(parametrosParaConstruir + "\n");
             result.Append("};\n");
-            result.Append("return customer;\n");
+            result.Append("return "+ pname.ToUpper() + ";\n");
             result.Append("}\n");
             result.Append("}\n");
             result.Append("}\n");
             Mapper = result.ToString();
         }
+
+
+
+        public void DefineManager(String pname, Attr[] param)
+        {
+            StringBuilder result = new StringBuilder();
+            result.Append("using DataAccess.Crud;\n");
+            result.Append("using Entities_POJO;\n");
+            result.Append("using System;\n");
+            result.Append("using System.Collections.Generic;\n");
+            result.Append("using System.Linq;\n");
+            result.Append("using System.Text;\n");
+            result.Append("using System.Threading.Tasks;\n");
+            result.Append("\n");
+            result.Append("namespace CoreApi\n");
+            result.Append("{\n");
+            result.Append("public class "+ PascalCase(pname) + "Manager\n");
+            result.Append("{\n");
+            result.Append("private "+ PascalCase(pname) + "CrudFactory " + PascalCase(pname).First().ToString().ToLower() + ClassName.Substring(1) + "CrudFactory;\n");
+            result.Append("public " + PascalCase(pname) + "Manager\n");
+            result.Append("{\n");
+            result.Append(PascalCase(pname).First().ToString().ToLower() + ClassName.Substring(1) + "CrudFactory = new " + PascalCase(pname) + "CrudFactory();\n");
+            result.Append("}\n");
+
+
+           
+
+
+            result.Append("public void Create(Queja queja)\n");
+            result.Append("{");
+            result.Append("quejaCrudFactory.Create(queja);\n");
+            result.Append("}\n");
+
+
+            result.Append("}\n");
+            result.Append("}\n");
+            Manager = result.ToString();
+        }
+
+
 
 
 
